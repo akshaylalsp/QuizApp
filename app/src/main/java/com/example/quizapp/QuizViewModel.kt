@@ -29,7 +29,7 @@ class QuizViewModel : ViewModel() {
 
     // StateFlow to expose data to the UI as a read-only flow
     val quizResponse: StateFlow<QuizResponse?> = _quizResponse
-
+    var score = 0
     init {
         getData()
     }
@@ -51,6 +51,20 @@ class QuizViewModel : ViewModel() {
             }
         }
     }
+
+    fun checkAnswerAndProceed(answer:String){
+        if (answer ==  correctAnswer){
+            score ++
+            println("hurray correct answer!! score is $score")
+        }
+        else
+            println("oops wrong one! score is $score")
+        nextQuestion()
+
+    }
+
+
+
 
     fun nextQuestion() {
 

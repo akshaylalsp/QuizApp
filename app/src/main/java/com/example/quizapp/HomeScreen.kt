@@ -42,7 +42,7 @@ fun QuizItemComponent(modifier: Modifier = Modifier,viewModel: QuizViewModel){
     println(response?.value?.response_code)
 
     var selectedItem by remember {
-        mutableStateOf(false)
+        mutableStateOf(-1)
     }
 
     if (response.value != null ||  response?.value?.response_code == 0){
@@ -52,9 +52,9 @@ fun QuizItemComponent(modifier: Modifier = Modifier,viewModel: QuizViewModel){
 //                quiz?.value?.question?.get(0)?.let { Text(text = it.question) }
                 Text(text = quiz?.value?.question?:"no data available")
             }
-            quiz.value?.options?.forEach {
-                OptionComponent(selectedItem = selectedItem, option = it){
-                    selectedItem = !selectedItem
+            quiz.value?.options?.forEachIndexed() {i,item->
+                OptionComponent(isSelected = i == selectedItem , option = item){
+                    selectedItem = i
                 }
             }
 
@@ -64,10 +64,10 @@ fun QuizItemComponent(modifier: Modifier = Modifier,viewModel: QuizViewModel){
 
             Row(modifier = Modifier.fillMaxSize(),horizontalArrangement = Arrangement.SpaceAround){
 
-                Button(onClick = { selectedItem = false }) {
+                Button(onClick = { selectedItem = -1 }) {
                     Text(text = "clear")
                 }
-                Button(onClick = { viewModel.nextQuestion() }) {
+                Button(onClick = { viewModel.checkAnswerAndProceed(quiz?.value?.options?.get(selectedItem)?:"") }) {
                     Text(text = "submit")
                 }
             }
@@ -86,10 +86,10 @@ fun QuizItemComponent(modifier: Modifier = Modifier,viewModel: QuizViewModel){
 
         Row(modifier = Modifier.fillMaxSize(),horizontalArrangement = Arrangement.SpaceAround){
 
-            Button(onClick = { selectedItem = false }) {
+            Button(onClick = { selectedItem = -1 }) {
                 Text(text = "clear")
             }
-            Button(onClick = { viewModel.nextQuestion() }) {
+            Button(onClick = { viewModel.checkAnswerAndProceed(quiz?.value?.options?.get(selectedItem)?:"") }) {
                 Text(text = "submit")
             }
         }
@@ -98,13 +98,13 @@ fun QuizItemComponent(modifier: Modifier = Modifier,viewModel: QuizViewModel){
 
 
 @Composable
-fun OptionComponent(selectedItem:Boolean,option:String,onClick:()->Unit,){
+fun OptionComponent(isSelected:Boolean,option:String,onClick:()->Unit,){
     Row(modifier = Modifier
         .fillMaxWidth()
         .clickable { onClick() },
         horizontalArrangement = Arrangement.Absolute.Left, verticalAlignment = Alignment.CenterVertically
     ) {
-        Box{ RadioButton(selected = selectedItem, onClick = onClick) }
+        Box{ RadioButton(selected = isSelected, onClick = onClick) }
         Box{ Text(text = option) }
     }
 }
